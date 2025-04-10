@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { MainLayout } from "@/components/layouts/main-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -108,7 +108,8 @@ const sampleEmployees: Employee[] = [
   },
 ];
 
-export default function PersonnelPage() {
+// PersonnelContent 컴포넌트 분리
+function PersonnelContent() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -290,5 +291,27 @@ export default function PersonnelPage() {
         </div>
       </div>
     </MainLayout>
+  );
+}
+
+// 로딩 중 UI
+function PersonnelLoading() {
+  return (
+    <MainLayout activePage="인사" userName="홍길동" pageTitle="인사 관리">
+      <div className="rounded-md border bg-white shadow-sm p-8">
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
+        </div>
+      </div>
+    </MainLayout>
+  );
+}
+
+// 메인 컴포넌트
+export default function PersonnelPage() {
+  return (
+    <Suspense fallback={<PersonnelLoading />}>
+      <PersonnelContent />
+    </Suspense>
   );
 }

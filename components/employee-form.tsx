@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -65,16 +65,12 @@ const sampleEmployees: Employee[] = [
 
 const employeeSchema = z.object({
   name: z.string().min(2, { message: "이름은 최소 2자 이상이어야 합니다." }),
-  birthdate: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, {
-      message: "YYYY-MM-DD 형식으로 입력해주세요.",
-    }),
-  contact: z
-    .string()
-    .regex(/^\d{3}-\d{4}-\d{4}$/, {
-      message: "000-0000-0000 형식으로 입력해주세요.",
-    }),
+  birthdate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
+    message: "YYYY-MM-DD 형식으로 입력해주세요.",
+  }),
+  contact: z.string().regex(/^\d{3}-\d{4}-\d{4}$/, {
+    message: "000-0000-0000 형식으로 입력해주세요.",
+  }),
   position: z.string().min(1, { message: "직급을 선택해주세요." }),
   department: z.string().min(1, { message: "부서를 선택해주세요." }),
   status: z.enum(["재직중", "퇴사"], {
@@ -85,7 +81,8 @@ const employeeSchema = z.object({
 
 type EmployeeFormValues = z.infer<typeof employeeSchema>;
 
-export default function EmployeeForm() {
+// SearchParams를 사용하는 컴포넌트를 별도로 분리
+function EmployeeFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const employeeId = searchParams.get("id");
@@ -376,5 +373,35 @@ export default function EmployeeForm() {
         </Card>
       </div>
     </MainLayout>
+  );
+}
+
+// 로딩 중 UI
+function EmployeeFormLoading() {
+  return (
+    <MainLayout activePage="인사" userName="홍길동" pageTitle="로딩 중...">
+      <div className="max-w-2xl mx-auto">
+        <Card>
+          <CardHeader>
+            <CardTitle>직원 정보 로딩 중...</CardTitle>
+            <CardDescription>잠시만 기다려주세요.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </MainLayout>
+  );
+}
+
+// 메인 컴포넌트
+export default function EmployeeForm() {
+  return (
+    <Suspense fallback={<EmployeeFormLoading />}>
+      <EmployeeFormContent />
+    </Suspense>
   );
 }

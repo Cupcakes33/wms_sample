@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -21,7 +21,8 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export default function LoginForm() {
+// LoginContent 컴포넌트 분리
+function LoginContent() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -136,5 +137,32 @@ export default function LoginForm() {
         </form>
       </div>
     </div>
+  );
+}
+
+// 로딩 중 UI
+function LoginLoading() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+      <div className="w-full max-w-sm">
+        <div className="bg-[#3366cc] text-white p-6 flex items-center justify-center text-2xl font-bold mb-4 rounded-t-lg shadow-md">
+          WMS 관리 시스템
+        </div>
+        <div className="bg-white shadow-md rounded-b-lg p-8">
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 메인 컴포넌트
+export default function LoginForm() {
+  return (
+    <Suspense fallback={<LoginLoading />}>
+      <LoginContent />
+    </Suspense>
   );
 }

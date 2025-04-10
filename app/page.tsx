@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -13,7 +14,8 @@ import {
 } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 
-export default function Home() {
+// HomeContent 컴포넌트 분리
+function HomeContent() {
   const router = useRouter();
 
   return (
@@ -112,5 +114,26 @@ export default function Home() {
         </footer>
       </div>
     </div>
+  );
+}
+
+// 로딩 중 UI
+function HomeLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white">
+      <div className="flex flex-col items-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-700 mb-4"></div>
+        <h2 className="text-xl font-semibold text-gray-700">로딩 중...</h2>
+      </div>
+    </div>
+  );
+}
+
+// 메인 컴포넌트
+export default function Home() {
+  return (
+    <Suspense fallback={<HomeLoading />}>
+      <HomeContent />
+    </Suspense>
   );
 }

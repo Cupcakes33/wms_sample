@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { MainLayout } from "@/components/layouts/main-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useRouter } from "next/navigation";
 
 // 작업 데이터 타입 정의
 interface WorkItem {
@@ -88,7 +89,9 @@ const sampleWorkItems: WorkItem[] = [
   },
 ];
 
-export default function WorkPage() {
+// WorkContent 컴포넌트 분리
+function WorkContent() {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [activeTab, setActiveTab] = useState("all");
@@ -137,6 +140,12 @@ export default function WorkPage() {
   // 콤마 추가 함수 (숫자 포맷팅)
   const formatNumber = (num: number) => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  // 신규 작업 등록 페이지로 이동
+  const handleRegisterWork = () => {
+    // 작업 등록 페이지로 이동하는 로직
+    router.push("/work/register");
   };
 
   return (
@@ -240,7 +249,10 @@ export default function WorkPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button className="bg-[#3366cc] hover:bg-blue-700 text-white">
+            <Button
+              className="bg-[#3366cc] hover:bg-blue-700 text-white"
+              onClick={handleRegisterWork}
+            >
               신규 작업 등록
             </Button>
           </div>
@@ -301,5 +313,27 @@ export default function WorkPage() {
         </div>
       </div>
     </MainLayout>
+  );
+}
+
+// 로딩 중 UI
+function WorkLoading() {
+  return (
+    <MainLayout activePage="작업" userName="홍길동" pageTitle="작업 관리">
+      <div className="bg-white rounded-md border shadow-sm p-8">
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
+        </div>
+      </div>
+    </MainLayout>
+  );
+}
+
+// 메인 컴포넌트
+export default function WorkPage() {
+  return (
+    <Suspense fallback={<WorkLoading />}>
+      <WorkContent />
+    </Suspense>
   );
 }
