@@ -1,23 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import {
-  Box,
-  Button,
-  Card,
-  Container,
-  Typography,
-  TextField,
-  MenuItem,
-  Grid,
-  AppBar,
-  Toolbar,
-  Avatar,
-} from "@/components/ui/mui";
-import { ArrowLeft, Save, Trash2, Edit } from "lucide-react";
+import { Suspense } from "react";
 import EmployeeForm from "@/components/employee-form";
 import { Toaster } from "@/components/ui/toaster";
-import { Suspense } from "react";
 
 // 로딩 UI
 function EmployeeFormPageLoading() {
@@ -28,13 +13,20 @@ function EmployeeFormPageLoading() {
   );
 }
 
-export default function EmployeeFormPage() {
-  const router = useRouter();
-
+// 페이지 컨텐츠 컴포넌트
+function EmployeeFormPageContent() {
   return (
     <>
       <EmployeeForm />
       <Toaster />
     </>
+  );
+}
+
+export default function EmployeeFormPage() {
+  return (
+    <Suspense fallback={<EmployeeFormPageLoading />}>
+      <EmployeeFormPageContent />
+    </Suspense>
   );
 }
